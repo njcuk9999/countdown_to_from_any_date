@@ -12,17 +12,17 @@ import sys
 # define starting date
 startyear = 2014
 startmonth = 10
-startday = 02
+startday = 2
 starthour = 12
-startminute = 00
-startsecond = 00
+startminute = 0
+startsecond = 0
 # define end date
 endyear = 2017
-endmonth = 03
+endmonth = 3
 endday = 31
 endhour = 12
-endminute = 00
-endsecond = 00
+endminute = 0
+endsecond = 0
 # kind of count down
 # kinds are:
 #           - "percentage"

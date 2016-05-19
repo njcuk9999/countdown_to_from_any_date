@@ -2,8 +2,7 @@
 Displays a percentage of a way between two dates, or count down to a date, or a count since a certain date
 
 
-#### count(startlist=None, endlist=None, kind="percentage",
-          pdec=8, cunit="days"):
+#### count(startlist=None, endlist=None, kind="percentage", pdec=8, cunit="days"):
 
     Displays a percentage of a way between two dates, or count down to a date, or a count since a certain date
 

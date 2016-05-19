@@ -147,6 +147,9 @@ def count(startlist=None, endlist=None, kind="percentage",
                     - "hours"
                     - "minutes"
                     - "seconds"
+                    - "milliseconds"
+                    - "microseconds"
+                    - "nanoseconds"
 
     :return:
     """
@@ -162,10 +165,10 @@ def count(startlist=None, endlist=None, kind="percentage",
 
     convert = dict(years=365.25 * 24 * 3600.0,
                    months=365.25 * 24 * 3600 / 12.0,
-                   days=24 * 3600.0,
-                   hours=3600.0,
-                   minutes=60.0,
-                   seconds=1.0)
+                   days=24 * 3600.0, hours=3600.0,
+                   minutes=60.0, seconds=1.0,
+                   milliseconds=1e-3, microseconds=1e-6,
+                   nanoseconds=1e-9)
 
     fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
     fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'

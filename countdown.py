@@ -11,15 +11,15 @@ import Tkinter as tk
 # ==============================================================================
 # define starting date
 startyear = 2015
-startmonth = 03
-startday = 01
+startmonth = 3
+startday = 1
 starthour = 12
 startminute = 0
 startsecond = 0
 # define end date
 endyear = 2018
 endmonth = 9
-endday = 01
+endday = 1
 endhour = 12
 endminute = 0
 endsecond = 0

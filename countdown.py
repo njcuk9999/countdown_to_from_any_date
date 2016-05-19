@@ -125,7 +125,8 @@ def unix_time(dttm=None):
 def count(startlist=None, endlist=None, kind="percentage",
           pdec=8, cunit="days"):
     """
-
+    Displays a percentage of a way between two dates, or count down to a date, or a count since a certain date
+    
     :param startlist: list of integers [year, month, day, hour, minute, second]
                       defining the start of the count down
 

@@ -23,7 +23,7 @@ Displays a percentage of a way between two dates, or count down to a date, or a 
                     - "minutes"
                     - "seconds"
 
-If __name__ == "__main__"
+If \_\_name\_\_ == \"\_\_main\_\_\"
 
 - If command gui = False above command will be used
 

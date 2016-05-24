@@ -41,6 +41,231 @@ gui = True
 # ==============================================================================
 # Define functions
 # ==============================================================================
+def count(startlist=None, endlist=None, kind="percentage",
+          pdec=8, cunit="days"):
+    """
+    Displays a percentage of a way between two dates, or count down to a date,
+    or a count since a certain date
+
+    :param startlist: list of integers [year, month, day, hour, minute, second]
+                      defining the start of the count down
+
+    :param endlist: list of integers [year, month, day, hour, minute, second]
+                    defining the start of the count down
+
+    :param kind: string, kind of count down, kinds are:
+                    - "percentage"
+                    - "count down"
+                    - "count since"
+
+    :param pdec: integer, number of decimal places to use in result
+
+    :param cunit: string, units to use in count downs:
+                    - "years"
+                    - "months"
+                    - "days"
+                    - "hours"
+                    - "minutes"
+                    - "seconds"
+
+    :return:
+    """
+    # deal with start and end (i.e. set to "NOW" if none else set 
+    # to the time defined in startlist/endlist)
+    if startlist is None:
+        start = unix_time()
+    else:
+        start = unix_time(datetime(*startlist))
+    if endlist is None:
+        end = unix_time()
+    else:
+        end = unix_time(datetime(*endlist))
+    # set up dictionary for conversion between units and seconds
+    convert = dict(years=365.25 * 24 * 3600.0,
+                   months=365.25 * 24 * 3600 / 12.0,
+                   days=24 * 3600.0,
+                   hours=3600.0,
+                   minutes=60.0,
+                   seconds=1.0)
+    # set up the date and time format string
+    fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
+    fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
+    # run code to produce count down
+    os.system("clear")
+    # if we want a percentage display percentage
+    if kind in ["percentage", "pc", r"%"]:
+        title = '\tPercentage From ' + fmt.format(*startlist)
+        title += ' To ' + fmt.format(*endlist)
+        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
+        while 1:
+            tick1 = unix_time()
+            # display percentage
+            percentage(tick1 - start, end - start, "\t",
+                       ptype="f{0}".format(pdec))
+            # wait 0.1 seconds to go again
+            time.sleep(0.1)
+    # if we want a count down display a count down
+    elif kind == "count down":
+        units = convert[cunit]
+        title = '\tCount down to ' + fmt.format(*endlist)
+        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
+        while 1:
+            start = unix_time()
+            msg = '\t{0:,.8f} {1}'.format((end - start)/units, cunit)
+            sys.stdout.write("\r" + msg)
+            sys.stdout.flush()
+            # wait 0.1 seconds to go again
+            time.sleep(0.1)
+    # else assume a count up is wanted
+    else:
+        units = convert[cunit]
+        title = '\tTime since ' + fmt.format(*startlist)
+        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
+        while 1:
+            end = unix_time()
+            msg = '\t{0:,.8f} {1}'.format((end - start) / units, cunit)
+            sys.stdout.write("\r" + msg)
+            sys.stdout.flush()
+            # wait 0.1 seconds to go again
+            time.sleep(0.1)
+
+
+class App(tk.Frame):
+    """
+    GUI to display count down/ count up /percentage in a pop up graphical 
+    user interface
+    """
+    def __init__(self, master=None):
+        """
+        Constructor for the app create app, window, canvas and widgets
+        """
+        # start display
+        tk.Frame.__init__(self, master)
+        self.parent = master
+        # set width and height
+        self.width = 640
+        self.height = 360
+        # apply width and height
+        self.parent.minsize(width=self.width, height=self.height)
+        # create a red canvas and fill the window with it 
+        self.can = tk.Canvas(self.parent, bg='red', height=self.height,
+                             width=self.width)
+        # place the canvas in the window at 0, 0 
+        # (North West corner of canvas)
+        self.can.place(x=0, y=0, anchor=tk.NW)
+        # call the create_widgets function to populate the canvas
+        self.create_widgets()
+
+    def create_widgets(self):
+        """
+        Populate the canvas with these widjets
+        """
+        # extract and save variables internally
+        # Note these should be read in, through the __init__???
+        self.kind = countdowntype
+        self.cunit = countdown_units
+        self.pdec = percent_decimals
+        startlist, endlist = startl, endl
+        # deal with start and end (as in count function)
+        if startlist is None:
+            self.start = unix_time()
+        else:
+            self.start = unix_time(datetime(*startlist))
+        if endlist is None:
+            self.end = unix_time()
+        else:
+            self.end = unix_time(datetime(*endlist))
+        # set up dictionary for conversion between units and seconds
+        self.convert = dict(years=365.25 * 24 * 3600.0,
+                       months=365.25 * 24 * 3600 / 12.0,
+                       days=24 * 3600.0,
+                       hours=3600.0,
+                       minutes=60.0,
+                       seconds=1.0)
+        # set up the date and time format string
+        fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
+        fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
+        # sort out the title
+        if self.kind in ["percentage", "pc", r"%"]:
+            title = "Percentage"
+            title1 = ' Percentage From ' + fmt.format(*startlist)
+            title1 += ' To ' + fmt.format(*endlist)
+        elif self.kind == "count down":
+            title = 'Count Down'
+            title1 = ' Count down to ' + fmt.format(*endlist)
+        else:
+            title = "Time since"
+            title1 = ' Time since ' + fmt.format(*startlist)
+        # set the title of the window
+        self.parent.title(title)
+        # make a label widget to display more information (see title1)
+        self.title = tk.Label(self.can, text=title1, font=('Helvetica', 16))
+        # place the title in the canvas
+        self.title.place(x=self.width/2.0, y=self.height/3.0, anchor=tk.CENTER)
+        # create a quit button to close the window when clicked
+        self.QUIT = tk.Button(self.can, text="QUIT", fg="red",
+                              command=root.destroy)
+        # place the quit button in the canvas
+        self.QUIT.place(x=self.width/2.0, y=self.height, anchor=tk.S)
+        # create a string variable and clock to display the count down
+        self.msg = tk.StringVar()
+        self.clock = tk.Label(self.can, font=('Helvetica', 24))
+        # place the clock in the canvas
+        self.clock.place(x=self.width/2.0, y=self.height/2.0,
+                         anchor=tk.CENTER)
+        # set the clocks text to the string variable
+        self.clock["textvariable"] = self.msg
+        # now call update clock
+        self.update_clock()
+
+    def update_clock(self, interval=10):
+        """
+        Method to update the clock (count down) every "interval" milliseconds
+        
+        :param interval: integer, time in milliseconds to call this function again 
+        """
+        # as with count function if percentage display a percentage
+        # (NOW - start)/(end - start) x 100%
+        if self.kind in ["percentage", "pc", r"%"]:
+            tick1 = unix_time()
+            # display percentage
+            num = float(tick1 - self.start)
+            denom = float(self.end - self.start)
+            percent = (num/denom) * 100.0
+            msg = r'{0:.8f} %'.format(percent)
+        # else if a count down display the count down (end - NOW)
+        elif self.kind == "count down":
+            units = self.convert[self.cunit]
+            self.start = unix_time()
+            diff = self.end - self.start
+            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
+        # else count up from the start (NOW - start)
+        else:
+            units = self.convert[self.cunit]
+            self.end = unix_time()
+            diff = self.end - self.start
+            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
+        # update the message to be displayed on the clock widget
+        self.msg.set(msg)
+        # after interval milliseconds recall this method
+        self.after(interval, self.update_clock)
+
+
+def unix_time(dttm=None):
+    """
+    converts date time objects to unix times
+    taken from http://stackoverflow.com/a/22918717
+
+    Note: if you pass in a naive dttm object it's assumed to already be in UTC
+
+    :param dttm: date time object (see from datetime import datetime)
+    :return:
+    """
+    if dttm is None:
+       dttm = datetime.utcnow()
+    return timegm(dttm.utctimetuple())
+
+
 def percentage(it1, total, message, ptype=None):
     """
     ===========================================================================
@@ -107,199 +332,6 @@ def percentage(it1, total, message, ptype=None):
     else:
         sys.stdout.write("\r" + message + "...%.6f%%" % percent)
         sys.stdout.flush()
-
-
-def unix_time(dttm=None):
-    """
-    converts date time objects to unix times
-    taken from http://stackoverflow.com/a/22918717
-
-    Note: if you pass in a naive dttm object it's assumed to already be in UTC
-
-    :param dttm: date time object (see from datetime import datetime)
-    :return:
-    """
-    if dttm is None:
-       dttm = datetime.utcnow()
-    return timegm(dttm.utctimetuple())
-
-
-def count(startlist=None, endlist=None, kind="percentage",
-          pdec=8, cunit="days"):
-    """
-    Displays a percentage of a way between two dates, or count down to a date,
-    or a count since a certain date
-
-    :param startlist: list of integers [year, month, day, hour, minute, second]
-                      defining the start of the count down
-
-    :param endlist: list of integers [year, month, day, hour, minute, second]
-                    defining the start of the count down
-
-    :param kind: string, kind of count down, kinds are:
-                    - "percentage"
-                    - "count down"
-                    - "count since"
-
-    :param pdec: integer, number of decimal places to use in result
-
-    :param cunit: string, units to use in count downs:
-                    - "years"
-                    - "months"
-                    - "days"
-                    - "hours"
-                    - "minutes"
-                    - "seconds"
-
-    :return:
-    """
-    # deal with start and end
-    if startlist is None:
-        start = unix_time()
-    else:
-        start = unix_time(datetime(*startlist))
-    if endlist is None:
-        end = unix_time()
-    else:
-        end = unix_time(datetime(*endlist))
-
-    convert = dict(years=365.25 * 24 * 3600.0,
-                   months=365.25 * 24 * 3600 / 12.0,
-                   days=24 * 3600.0,
-                   hours=3600.0,
-                   minutes=60.0,
-                   seconds=1.0)
-
-    fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
-    fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
-    # run code to produce count down
-    os.system("clear")
-
-    if kind in ["percentage", "pc", r"%"]:
-        title = '\tPercentage From ' + fmt.format(*startlist)
-        title += ' To ' + fmt.format(*endlist)
-        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
-        while 1:
-            tick1 = unix_time()
-            # display percentage
-            percentage(tick1 - start, end - start, "\t",
-                       ptype="f{0}".format(pdec))
-            # wait 0.1 seconds to go again
-            time.sleep(0.1)
-    elif kind == "count down":
-        units = convert[cunit]
-        title = '\tCount down to ' + fmt.format(*endlist)
-        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
-        while 1:
-            start = unix_time()
-            msg = '\t{0:,.8f} {1}'.format((end - start)/units, cunit)
-            sys.stdout.write("\r" + msg)
-            sys.stdout.flush()
-            # wait 0.1 seconds to go again
-            time.sleep(0.1)
-    else:
-        units = convert[cunit]
-        title = '\tTime since ' + fmt.format(*startlist)
-        print ('\n{0}\n{1}\n{0}\n\n'.format('=' * 50, title))
-        while 1:
-            end = unix_time()
-            msg = '\t{0:,.8f} {1}'.format((end - start) / units, cunit)
-            sys.stdout.write("\r" + msg)
-            sys.stdout.flush()
-            # wait 0.1 seconds to go again
-            time.sleep(0.1)
-
-
-class App(tk.Frame):
-    def __init__(self, master=None):
-        # start display
-        tk.Frame.__init__(self, master)
-        self.parent = master
-
-        self.width = 640
-        self.height = 360
-
-        self.parent.minsize(width=self.width, height=self.height)
-
-        self.can = tk.Canvas(self.parent, bg='red', height=self.height,
-                             width=self.width)
-        self.can.place(x=0, y=0, anchor=tk.NW)
-
-        self.create_widgets()
-
-
-    def create_widgets(self):
-        self.kind = countdowntype
-        self.cunit = countdown_units
-        self.pdec = percent_decimals
-        startlist, endlist = startl, endl
-        # deal with start and end
-        if startlist is None:
-            self.start = unix_time()
-        else:
-            self.start = unix_time(datetime(*startlist))
-        if endlist is None:
-            self.end = unix_time()
-        else:
-            self.end = unix_time(datetime(*endlist))
-
-        self.convert = dict(years=365.25 * 24 * 3600.0,
-                            months=365.25 * 24 * 3600 / 12.0,
-                            days=24 * 3600.0,
-                            hours=3600.0,
-                            minutes=60.0,
-                            seconds=1.0)
-        fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
-        fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
-
-        # sort out the title
-        if self.kind in ["percentage", "pc", r"%"]:
-            title = '\tPercentage From ' + fmt.format(*startlist)
-            title += ' To ' + fmt.format(*endlist)
-        elif self.kind == "count down":
-            title = '\tCount down to ' + fmt.format(*endlist)
-        else:
-            title = '\tTime since ' + fmt.format(*startlist)
-
-        self.parent.title(title)
-
-        self.QUIT = tk.Button(self.can, text="QUIT", fg="red",
-                              command=root.destroy)
-        self.QUIT.place(x=self.width/2.0, y=self.height, anchor=tk.S)
-
-        self.msg = tk.StringVar()
-        self.clock = tk.Label(self.can, font=('Helvetica', 24))
-        # self.clock.pack(side="top")
-        self.clock.place(x=self.width/2.0, y=self.height/2.0,
-                         anchor=tk.CENTER)
-        self.clock["textvariable"] = self.msg
-
-        # now call update clock
-        self.update_clock()
-
-
-
-    def update_clock(self):
-        if self.kind in ["percentage", "pc", r"%"]:
-            tick1 = unix_time()
-            # display percentage
-            num = float(tick1 - self.start)
-            denom = float(self.end - self.start)
-            percent = (num/denom) * 100.0
-            msg = r'{0:.8f} %'.format(percent)
-        elif self.kind == "count down":
-            units = self.convert[self.cunit]
-            self.start = unix_time()
-            diff = self.end - self.start
-            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
-        else:
-            units = self.convert[self.cunit]
-            self.end = unix_time()
-            diff = self.end - self.start
-            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
-        self.msg.set(msg)
-
-        self.after(10, self.update_clock)
 
 
 # ==============================================================================

@@ -90,6 +90,14 @@ def count(startlist=None, endlist=None, kind="percentage",
     # set up the date and time format string
     fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
     fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
+    # sort out number of decimals
+    decimals = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
+    if str(self.pdec).isdigit():
+        pfmt = 'f{0}'.format(int(self.pdec)) 
+    elif self.pdec in decimals:
+        pfmt  = decimals[self.pdec]
+    else:
+        pfmt  = 'f8'
     # run code to produce count down
     os.system("clear")
     # if we want a percentage display percentage
@@ -186,13 +194,13 @@ class App(tk.Frame):
         fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
         fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
         # sort out number of decimals
-        kinds = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
-        if self.pdec.isdigit():
-            pd = '.f{0}'.format(int(self.pdec)) 
-        elif self.pdec in kinds:
-            self.pfmt = {'0:' + kinds[self.pdec] + '}'
+        decimals = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
+        if str(self.pdec).isdigit():
+            self.pfmt = '{0:.f' + '{0}'.format(int(self.pdec)) + '}' 
+        elif self.pdec in decimals:
+            self.pfmt = '{0:' + decimals[self.pdec] + '}'
         else:
-             self.pdec = {'0:.8f'}
+            self.pfmt = '{0:.8f}'
         # sort out the title
         if self.kind in ["percentage", "pc", r"%"]:
             title = "Percentage"

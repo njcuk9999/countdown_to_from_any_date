@@ -70,7 +70,7 @@ def count(startlist=None, endlist=None, kind="percentage",
 
     :return:
     """
-    # deal with start and end (i.e. set to "NOW" if none else set 
+    # deal with start and end (i.e. set to "NOW" if none else set
     # to the time defined in startlist/endlist)
     if startlist is None:
         start = unix_time()
@@ -92,10 +92,10 @@ def count(startlist=None, endlist=None, kind="percentage",
     fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
     # sort out number of decimals
     decimals = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
-    if str(self.pdec).isdigit():
-        pfmt = 'f{0}'.format(int(self.pdec)) 
+    if str(pdec).isdigit():
+        pfmt = 'f{0}'.format(int(pdec))
     elif self.pdec in decimals:
-        pfmt  = decimals[self.pdec]
+        pfmt  = decimals[pdec]
     else:
         pfmt  = 'f8'
     # run code to produce count down
@@ -140,7 +140,7 @@ def count(startlist=None, endlist=None, kind="percentage",
 
 class App(tk.Frame):
     """
-    GUI to display count down/ count up /percentage in a pop up graphical 
+    GUI to display count down/ count up /percentage in a pop up graphical
     user interface
     """
     def __init__(self, master=None):
@@ -155,10 +155,10 @@ class App(tk.Frame):
         self.height = 360
         # apply width and height
         self.parent.minsize(width=self.width, height=self.height)
-        # create a red canvas and fill the window with it 
+        # create a red canvas and fill the window with it
         self.can = tk.Canvas(self.parent, bg='red', height=self.height,
                              width=self.width)
-        # place the canvas in the window at 0, 0 
+        # place the canvas in the window at 0, 0
         # (North West corner of canvas)
         self.can.place(x=0, y=0, anchor=tk.NW)
         # call the create_widgets function to populate the canvas
@@ -196,7 +196,7 @@ class App(tk.Frame):
         # sort out number of decimals
         decimals = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
         if str(self.pdec).isdigit():
-            self.pfmt = '{0:.f' + '{0}'.format(int(self.pdec)) + '}' 
+            self.pfmt = '{0:.' + '{0}f'.format(int(self.pdec)) + '}'
         elif self.pdec in decimals:
             self.pfmt = '{0:' + decimals[self.pdec] + '}'
         else:
@@ -237,8 +237,8 @@ class App(tk.Frame):
     def update_clock(self, interval=10):
         """
         Method to update the clock (count down) every "interval" milliseconds
-        
-        :param interval: integer, time in milliseconds to call this function again 
+
+        :param interval: integer, time in milliseconds to call this function again
         """
         # as with count function if percentage display a percentage
         # (NOW - start)/(end - start) x 100%
@@ -333,7 +333,7 @@ def percentage(it1, total, message, ptype=None):
         fmt = '...{0:' + kinds[ptype] + '}'
     except KeyError:
         fmt = '...{0:.8f}'
-    
+
     sys.stdout.write("\r" + message + fmt.format(percent))
     sys.stdout.flush()
 

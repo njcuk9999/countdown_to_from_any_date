@@ -28,7 +28,7 @@ endsecond = 0
 #           - "percentage"
 #           - "count down"
 #           - "count since"
-countdowntype = "count down"
+countdowntype = "percentage"
 # define the number of decimal places for percent
 percent_decimals = 8
 # define whether we want the count down in years, months, days, hours,
@@ -185,6 +185,14 @@ class App(tk.Frame):
         # set up the date and time format string
         fmt = '{0:02.0f}-{1:02.0f}-{2:02.0f} '
         fmt += '{3:02.0f}:{4:02.0f}:{5:02.2f}'
+        # sort out number of decimals
+        kinds = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
+        if self.pdec.isdigit():
+            pd = '.f{0}'.format(int(self.pdec)) 
+        elif self.pdec in kinds:
+            self.pfmt = {'0:' + kinds[self.pdec] + '}'
+        else:
+             self.pdec = {'0:.8f'}
         # sort out the title
         if self.kind in ["percentage", "pc", r"%"]:
             title = "Percentage"
@@ -232,19 +240,19 @@ class App(tk.Frame):
             num = float(tick1 - self.start)
             denom = float(self.end - self.start)
             percent = (num/denom) * 100.0
-            msg = r'{0:.8f} %'.format(percent)
+            msg = self.pfmt.format(percent) + r' %'
         # else if a count down display the count down (end - NOW)
         elif self.kind == "count down":
             units = self.convert[self.cunit]
             self.start = unix_time()
             diff = self.end - self.start
-            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
+            msg = '\t' + self.pfmt.format(diff / units) + ' {0}'.format(self.cunit)
         # else count up from the start (NOW - start)
         else:
             units = self.convert[self.cunit]
             self.end = unix_time()
             diff = self.end - self.start
-            msg = '\t{0:,.8f} {1}'.format(diff / units, self.cunit)
+            msg = '\t' + self.pfmt.format(diff / units) + ' {0}'.format(self.cunit)
         # update the message to be displayed on the clock widget
         self.msg.set(msg)
         # after interval milliseconds recall this method
@@ -312,26 +320,14 @@ def percentage(it1, total, message, ptype=None):
                 None/Other  - returns percentage to six decimal places
     """
     percent = (float(it1) / float(total)) * 100.0
-    if ptype == 'i':
-        sys.stdout.write("\r" + message + "...%d%%" % percent)
-        sys.stdout.flush()
-    elif ptype == 'f0':
-        sys.stdout.write("\r" + message + "...%.0f%%" % percent)
-        sys.stdout.flush()
-    elif ptype == 'f2':
-        sys.stdout.write("\r" + message + "...%.2f%%" % percent)
-        sys.stdout.flush()
-    elif ptype == 'f4':
-        sys.stdout.write("\r" + message + "...%.4f%%" % percent)
-        sys.stdout.flush()
-    elif ptype == 'bar':
-        for j1 in range(1, 50):
-            if round(percent) == float(j1 * 2.0):
-                sys.stdout.write("\r" + "Loading (%.2f%%)" % percent + "=" * j1)
-                sys.stdout.flush()
-    else:
-        sys.stdout.write("\r" + message + "...%.6f%%" % percent)
-        sys.stdout.flush()
+    kinds = dict(i='03d', f0='.0f', f2='.2f', f4='.4f', f6='.6f')
+    try:
+        fmt = '...{0:' + kinds[ptype] + '}'
+    except KeyError:
+        fmt = '...{0:.8f}'
+    
+    sys.stdout.write("\r" + message + fmt.format(percent))
+    sys.stdout.flush()
 
 
 # ==============================================================================

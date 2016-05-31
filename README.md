@@ -1,9 +1,9 @@
 # countdown_to_from_any_date
 Displays a percentage of a way between two dates, or count down to a date, or a count since a certain date
 
-
-#### count(startlist=None, endlist=None, kind="percentage", pdec=8, cunit="days"):
-
+```python
+count(startlist=None, endlist=None, kind="percentage", pdec=8, cunit="days"):
+```
     Displays a percentage of a way between two dates, or count down to a date,
     or a count since a certain date
     :param startlist: list of integers [year, month, day, hour, minute, second]
@@ -22,9 +22,9 @@ Displays a percentage of a way between two dates, or count down to a date, or a 
                     - "hours"
                     - "minutes"
                     - "seconds"
-
-#### class App(tk.Frame):
-
+```python
+class App(tk.Frame):
+```
     GUI to display count down/ count up /percentage in a pop up graphical 
     user interface
     
@@ -49,8 +49,6 @@ Displays a percentage of a way between two dates, or count down to a date, or a 
                     - "seconds"
 
 #### run main code:
-
-If \_\_name\_\_ == "\_\_main\_\_"
 
 - If command gui = False above command will be used
 
@@ -78,3 +76,25 @@ for which user must define the following variables:
                             - "hours"
                             - "minutes"
                             - "seconds"
+                            
+#### Example run
+
+```python
+    # set up starting parameters as list of integers
+    # [year, month, day, hour, minute, second] defining the start of
+    # the count down
+    startl = [startyear, startmonth, startday,
+              starthour, startminute, startsecond]
+    # set up ending parameters as list of integers
+    # [year, month, day, hour, minute, second] defining the start of
+    # the count down
+    endl = [endyear, endmonth, endday, endhour, endminute, endsecond]
+
+    # run the count
+    if not gui:
+        count(startl, endl, countdowntype, percent_decimals, countdown_units)
+    else:
+        root = tk.Tk()
+        app = App(master=root)
+        root.mainloop()
+```

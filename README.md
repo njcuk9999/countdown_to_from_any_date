@@ -90,6 +90,20 @@ for which user must define the following variables:
     # the count down
     endl = [endyear, endmonth, endday, endhour, endminute, endsecond]
 
+    # kind of count down
+    # kinds are:
+    #           - "percentage"
+    #           - "count down"
+    #           - "count since"
+    countdowntype = "percentage"
+    # define the number of decimal places for percent
+    percent_decimals = 8
+    # define whether we want the count down in years, months, days, hours,
+    # minutes or seconds
+    countdown_units = "days"
+    # use gui
+    gui = True
+
     # run the count
     if not gui:
         count(startl, endl, countdowntype, percent_decimals, countdown_units)
